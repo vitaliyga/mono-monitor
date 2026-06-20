@@ -1,14 +1,14 @@
-// Telegram-бот для мониторинга спреда USD и EUR в monobank.
-// Спред = rateSell - rateBuy = стоимость круговой сделки
-// (продал по rateBuy, сразу откупил по rateSell). Чем меньше спред,
-// тем дешевле "продать и сразу купить".
+// Telegram-бот для моніторингу спреду USD і EUR у monobank.
+// Спред = rateSell - rateBuy = вартість кругової угоди
+// (продав за rateBuy, одразу відкупив за rateSell). Що менший спред,
+// то дешевше «продати й одразу купити».
 //
-// Деплоится на Cloudflare Workers: webhook (fetch) + Cron Trigger (scheduled).
+// Деплоїться на Cloudflare Workers: webhook (fetch) + Cron Trigger (scheduled).
 
 const MONO_CURRENCY_URL = "https://api.monobank.ua/bank/currency";
 const UAH = 980;
 
-// Отслеживаемые валюты: код ISO 4217 -> ключ
+// Відстежувані валюти: код ISO 4217 -> ключ
 const CURRENCIES = {
   USD: 840,
   EUR: 978,
@@ -16,7 +16,7 @@ const CURRENCIES = {
 const CUR_KEYS = Object.keys(CURRENCIES);
 const CUR_ALIASES = { usd: "USD", eur: "EUR", "840": "USD", "978": "EUR" };
 
-const DEFAULT_THRESHOLD = 0.5; // порог разницы по умолчанию, грн
+const DEFAULT_THRESHOLD = 0.5; // поріг різниці за замовчуванням, грн
 
 const tg = (token, method) => `https://api.telegram.org/bot${token}/${method}`;
 const round = (n) => Math.round(n * 10000) / 10000;
@@ -49,7 +49,7 @@ export default {
 
 // ---------- monobank ----------
 
-// Возвращает { USD: {buy, sell, spread, date} | null, EUR: ... }
+// Повертає { USD: {buy, sell, spread, date} | null, EUR: ... }
 async function getRates() {
   const resp = await fetch(MONO_CURRENCY_URL, {
     headers: { "User-Agent": "cf-worker-mono-rate-bot" },
@@ -71,14 +71,14 @@ async function getRates() {
         date: row.date,
       };
     } else {
-      // По ночам/выходным наличного курса может не быть (есть только rateCross)
+      // Уночі/у вихідні готівкового курсу може не бути (є лише rateCross)
       out[cur] = null;
     }
   }
   return out;
 }
 
-// Получить курсы и обновить запомненный минимум спреда (глобально по валюте)
+// Отримати курси й оновити запам'ятований мінімум спреду (глобально по валюті)
 async function fetchAndRecord(env) {
   const rates = await getRates();
   for (const cur of CUR_KEYS) {
@@ -111,7 +111,7 @@ function normalizeChat(chat) {
   if (typeof chat.enabled !== "boolean") chat.enabled = true;
 
   if (!chat.thresholds) {
-    // миграция со старого формата { threshold: number }
+    // міграція зі старого формату { threshold: number }
     const legacy =
       typeof chat.threshold === "number" ? chat.threshold : DEFAULT_THRESHOLD;
     chat.thresholds = { USD: legacy };
@@ -148,7 +148,7 @@ async function recordMin(env, cur, spread) {
   }
 }
 
-// ---------- Команды ----------
+// ---------- Команди ----------
 
 async function handleUpdate(update, env) {
   const message = update.message || update.edited_message;
@@ -217,7 +217,7 @@ async function cmdSet(env, chatId, parts) {
     cur = CUR_ALIASES[a];
     valueStr = parts[2];
   } else {
-    valueStr = parts[1]; // без валюты -> ставим обеим
+    valueStr = parts[1]; // без валюти -> ставимо обом
   }
 
   const value = parseFloat((valueStr || "").replace(",", "."));
@@ -236,7 +236,7 @@ async function cmdSet(env, chatId, parts) {
   const targets = cur ? [cur] : CUR_KEYS;
   for (const c of targets) {
     chat.thresholds[c] = round(value);
-    chat.notified[c] = false; // сбрасываем, чтобы сработало заново на новом пороге
+    chat.notified[c] = false; // скидаємо, щоб спрацювало знову на новому порозі
   }
   chat.enabled = true;
   await saveChat(env, chatId, chat);
@@ -320,14 +320,14 @@ function fmtTime(ts) {
   }
 }
 
-// ---------- Cron: периодическая проверка ----------
+// ---------- Cron: періодична перевірка ----------
 
 async function checkRates(env) {
   let rates;
   try {
     rates = await fetchAndRecord(env);
   } catch (e) {
-    console.error("checkRates: курс недоступен:", e.message);
+    console.error("checkRates: курс недоступний:", e.message);
     return;
   }
 
@@ -360,7 +360,7 @@ async function checkRates(env) {
             changed = true;
           }
         } else if (chat.notified[cur]) {
-          chat.notified[cur] = false; // спред вырос — разрешаем сработать снова
+          chat.notified[cur] = false; // спред виріс — дозволяємо спрацювати знову
           changed = true;
         }
       }

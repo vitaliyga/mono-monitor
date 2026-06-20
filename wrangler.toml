@@ -2,18 +2,18 @@ name = "mono-monitor-bot"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
 
-# Проверка курса каждые 10 минут.
-# monobank кеширует курс ~5 мин и лимитирует частоту запросов,
-# поэтому чаще ставить не стоит.
+# Перевірка курсу кожні 10 хвилин.
+# monobank кешує курс ~5 хв і лімітує частоту запитів,
+# тому частіше ставити не варто.
 [triggers]
 crons = ["*/10 * * * *"]
 
-# Хранилище подписчиков и их настроек.
-# id подставь после `wrangler kv namespace create KV`.
+# Сховище підписників та їхніх налаштувань.
+# id підстав після `wrangler kv namespace create KV`.
 [[kv_namespaces]]
 binding = "KV"
 id = "2beffbfb71534c0ab2bd13d0b639c3ec"
 
-# BOT_TOKEN и WEBHOOK_SECRET задаются как секреты, не здесь:
+# BOT_TOKEN і WEBHOOK_SECRET задаються як секрети, не тут:
 #   wrangler secret put BOT_TOKEN
 #   wrangler secret put WEBHOOK_SECRET

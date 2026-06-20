@@ -1,4 +1,4 @@
-name = "mono-rate-bot"
+name = "mono-monitor-bot"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
 
@@ -12,7 +12,7 @@ crons = ["*/10 * * * *"]
 # id подставь после `wrangler kv namespace create KV`.
 [[kv_namespaces]]
 binding = "KV"
-id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
+id = "2beffbfb71534c0ab2bd13d0b639c3ec"
 
 # BOT_TOKEN и WEBHOOK_SECRET задаются как секреты, не здесь:
 #   wrangler secret put BOT_TOKEN

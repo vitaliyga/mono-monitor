@@ -1,0 +1,19 @@
+name = "mono-rate-bot"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+
+# Проверка курса каждые 10 минут.
+# monobank кеширует курс ~5 мин и лимитирует частоту запросов,
+# поэтому чаще ставить не стоит.
+[triggers]
+crons = ["*/10 * * * *"]
+
+# Хранилище подписчиков и их настроек.
+# id подставь после `wrangler kv namespace create KV`.
+[[kv_namespaces]]
+binding = "KV"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
+
+# BOT_TOKEN и WEBHOOK_SECRET задаются как секреты, не здесь:
+#   wrangler secret put BOT_TOKEN
+#   wrangler secret put WEBHOOK_SECRET
